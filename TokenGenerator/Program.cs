@@ -5,6 +5,7 @@ using TokenGenerator.TokenGeneratorDataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+var defaultCorsPolicyName = "DefaultName";
 
 // Add services to the container.
 
@@ -13,6 +14,24 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuoteService, QuoteService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        defaultCorsPolicyName,
+        builder =>
+        {
+            builder.WithOrigins(
+                    configuration.GetSection("http://localhost:3000")
+                        .GetChildren()
+                        .Select(x => x.Value)
+                        .ToArray())
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowedToAllowWildcardSubdomains();
+        });
+});
 
 // Add UserDbContext
 builder.Services.AddDbContext<UserDbContext>(options =>
@@ -29,6 +48,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(defaultCorsPolicyName);
 
 app.UseAuthorization();
 app.UseAuthentication();

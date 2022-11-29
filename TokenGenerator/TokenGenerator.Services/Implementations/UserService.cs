@@ -50,4 +50,18 @@ public class UserService : IUserService
 
         return token;
     }
+    
+    public JwtSecurityToken RefreshToken()
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+
+        var token = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(30));
+
+        return token;
+    }
 }

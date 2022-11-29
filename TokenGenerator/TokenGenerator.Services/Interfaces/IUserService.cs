@@ -8,4 +8,5 @@ public interface IUserService
 {
     Task<Guid> Register(RegisterModel user);
     Task<JwtSecurityToken> Login(LoginModel user);
+    JwtSecurityToken RefreshToken();
 }

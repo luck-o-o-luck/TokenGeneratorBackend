@@ -29,8 +29,9 @@ public class UserController : ControllerBase
 
         return Ok(new
         {
-            result = new JwtSecurityTokenHandler().WriteToken(result),
-            expiration = result.ValidTo
+            accessToken = new JwtSecurityTokenHandler().WriteToken(result),
+            expiration = result.ValidTo,
+            email = user.Email
         });
     }
 
@@ -44,5 +45,22 @@ public class UserController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpGet("[action]")]
+    public IActionResult RefreshToken()
+    {
+        var result = _userService.RefreshToken();
+        
+        if (result == null)
+        {
+            return BadRequest("Invalid username or password");
+        }
+
+        return Ok(new
+        {
+            accessToken = new JwtSecurityTokenHandler().WriteToken(result),
+            expiration = result.ValidTo,
+        });
     }
 }
